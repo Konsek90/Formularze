@@ -15,3 +15,11 @@ interface Field {
     getValue(): string;
 }
 
+class FieldLabel {
+    static stworz(pole: Field): HTMLLabelElement {
+        let etykieta = document.createElement("label");
+        etykieta.innerHTML = pole.etykieta;
+        etykieta.htmlFor = pole.nazwa;
+        return etykieta;
+    }
+}
