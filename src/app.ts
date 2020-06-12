@@ -154,3 +154,24 @@ class Form {
         return wartosci;
     }
 }
+
+class App {
+    inicjacja() {
+        let formularz = this.stworzFormularz();
+        formularz.render(document.body);
+    }
+
+    stworzFormularz(): Form {
+        return new Form([
+            new InputField("imie", "Imię", FieldType.TEXT),
+            new InputField("nazwisko", "Nazwisko", FieldType.TEXT),
+            new InputField("email", "E-mail", FieldType.EMAIL),
+            new SelectField("kierunek", "Wybrany kierunek studiów", ["Informatyka i Ekonometria", "Finanse i Rachunkowość", "Zarządzanie"]),
+            new CheckboxField("elearning", "Czy preferujesz e-learning?"),
+            new TextAreaField("uwagi", "Uwagi")
+        ]);
+    }
+}
+
+const APP = new App();
+APP.inicjacja();

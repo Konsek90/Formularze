@@ -123,3 +123,24 @@ var Form = /** @class */ (function () {
     };
     return Form;
 }());
+var App = /** @class */ (function () {
+    function App() {
+    }
+    App.prototype.inicjacja = function () {
+        var formularz = this.stworzFormularz();
+        formularz.render(document.body);
+    };
+    App.prototype.stworzFormularz = function () {
+        return new Form([
+            new InputField("imie", "Imię", FieldType.TEXT),
+            new InputField("nazwisko", "Nazwisko", FieldType.TEXT),
+            new InputField("email", "E-mail", FieldType.EMAIL),
+            new SelectField("kierunek", "Wybrany kierunek studiów", ["Informatyka i Ekonometria", "Finanse i Rachunkowość", "Zarządzanie"]),
+            new CheckboxField("elearning", "Czy preferujesz e-learning?"),
+            new TextAreaField("uwagi", "Uwagi")
+        ]);
+    };
+    return App;
+}());
+var APP = new App();
+APP.inicjacja();
