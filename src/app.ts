@@ -119,3 +119,38 @@ class CheckboxField implements Field {
         return this.element.value;
     }
 }
+
+class Form {
+    pola: Field[];
+    
+    constructor(pola: Field[]) {
+        this.pola = pola;
+    }
+
+    render(rodzic: HTMLElement): void {
+        let formularz = document.createElement("form");
+
+        for (const pole of this.pola) {
+           pole.render(formularz);
+        }
+
+        let przycisk = document.createElement("button");
+        przycisk.type = "submit";
+        przycisk.innerHTML = "Wyślij";
+        przycisk.addEventListener("click", (e) => {
+            e.preventDefault();
+        });
+        formularz.appendChild(przycisk);
+
+        rodzic.appendChild(formularz);
+    }
+
+    getValue(): {[key: string]: string}{
+        let wartosci: {[key: string]: string} = {};
+        
+        for (const pole of this.pola) {
+            wartosci[pole.element.name] = pole.getValue(); 
+        }
+        return wartosci;
+    }
+}

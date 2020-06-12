@@ -1,3 +1,7 @@
 body {
     text-align: center;
 }
+input, select, textarea {
+    margin: 5px auto;
+    display: block;
+}

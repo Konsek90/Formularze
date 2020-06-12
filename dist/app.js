@@ -94,3 +94,32 @@ var CheckboxField = /** @class */ (function () {
     };
     return CheckboxField;
 }());
+var Form = /** @class */ (function () {
+    function Form(pola) {
+        this.pola = pola;
+    }
+    Form.prototype.render = function (rodzic) {
+        var formularz = document.createElement("form");
+        for (var _i = 0, _a = this.pola; _i < _a.length; _i++) {
+            var pole = _a[_i];
+            pole.render(formularz);
+        }
+        var przycisk = document.createElement("button");
+        przycisk.type = "submit";
+        przycisk.innerHTML = "Wyślij";
+        przycisk.addEventListener("click", function (e) {
+            e.preventDefault();
+        });
+        formularz.appendChild(przycisk);
+        rodzic.appendChild(formularz);
+    };
+    Form.prototype.getValue = function () {
+        var wartosci = {};
+        for (var _i = 0, _a = this.pola; _i < _a.length; _i++) {
+            var pole = _a[_i];
+            wartosci[pole.element.name] = pole.getValue();
+        }
+        return wartosci;
+    };
+    return Form;
+}());
