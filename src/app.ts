@@ -145,7 +145,7 @@ class Form {
         rodzic.appendChild(formularz);
     }
 
-    getValue(): {[key: string]: string}{
+    getValue(): any {
         let wartosci: {[key: string]: string} = {};
         
         for (const pole of this.pola) {
@@ -153,6 +153,12 @@ class Form {
         }
         return wartosci;
     }
+}
+
+interface DataStorage {
+    saveDocument(formValues: any): string,
+    loadDocument(idDokumentu: string): any,
+    getDocuments(): string[]
 }
 
 class App {
