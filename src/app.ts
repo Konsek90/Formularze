@@ -156,9 +156,49 @@ class Form {
 }
 
 interface DataStorage {
-    saveDocument(formValues: any): string,
+    saveDocument(wartosci: any): string,
     loadDocument(idDokumentu: string): any,
     getDocuments(): string[]
+}
+
+class LocStorage implements DataStorage {
+    saveDocument(wartosci: any, id = ""): string {
+        if (id === "") {
+            id = "document-" + Date.now();
+        }
+        
+        let listaDokumentow = localStorage.getItem("documentList");
+        let dokumenty = [];
+
+        if (listaDokumentow !== null) {
+            dokumenty = JSON.parse(listaDokumentow);
+        }
+
+        if(dokumenty.indexOf(id) > -1) {
+            dokumenty.push(id);
+        }
+
+        localStorage.setItem("documentList", JSON.stringify(dokumenty));
+        localStorage.setItem(id, JSON.stringify(wartosci));
+
+        return id;
+    }
+
+    loadDocument(id: string): any {
+        return JSON.parse(localStorage.getItem(id)!);    
+    }
+
+    getDocuments(): string[] {
+        let listaDokumentow = localStorage.getItem("documentList");
+
+        let dokumenty : string[] = [];
+ 
+        if (listaDokumentow !== null) {
+            dokumenty = JSON.parse(listaDokumentow);
+        }
+
+        return dokumenty;
+    }
 }
 
 class App {

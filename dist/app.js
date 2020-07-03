@@ -123,6 +123,39 @@ var Form = /** @class */ (function () {
     };
     return Form;
 }());
+var LocStorage = /** @class */ (function () {
+    function LocStorage() {
+    }
+    LocStorage.prototype.saveDocument = function (wartosci, id) {
+        if (id === void 0) { id = ""; }
+        if (id === "") {
+            id = "document-" + Date.now();
+        }
+        var listaDokumentow = localStorage.getItem("documentList");
+        var dokumenty = [];
+        if (listaDokumentow !== null) {
+            dokumenty = JSON.parse(listaDokumentow);
+        }
+        if (dokumenty.indexOf(id) > -1) {
+            dokumenty.push(id);
+        }
+        localStorage.setItem("documentList", JSON.stringify(dokumenty));
+        localStorage.setItem(id, JSON.stringify(wartosci));
+        return id;
+    };
+    LocStorage.prototype.loadDocument = function (id) {
+        return JSON.parse(localStorage.getItem(id));
+    };
+    LocStorage.prototype.getDocuments = function () {
+        var listaDokumentow = localStorage.getItem("documentList");
+        var dokumenty = [];
+        if (listaDokumentow !== null) {
+            dokumenty = JSON.parse(listaDokumentow);
+        }
+        return dokumenty;
+    };
+    return LocStorage;
+}());
 var App = /** @class */ (function () {
     function App() {
     }
