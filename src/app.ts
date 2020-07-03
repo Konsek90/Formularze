@@ -139,7 +139,7 @@ class Form {
         przyciskWstecz.type = "button";
         przyciskWstecz.innerHTML = "Wstecz";
         przyciskWstecz.addEventListener("click", (e) => {
-            window.location.href = "/index.html";
+            window.location.href = "index.html";
         });
         formularz.appendChild(przyciskWstecz);
 
@@ -213,6 +213,23 @@ class LocStorage implements DataStorage {
 
         return dokumenty;
     }
+
+    removeDocument(id: string): void {
+
+        let listaDokumentow = localStorage.getItem("documentsList");
+        let dokumenty : string[] = [];
+
+        if (listaDokumentow !== null) {
+            dokumenty = JSON.parse(listaDokumentow);
+        }
+
+        if (dokumenty.indexOf(id) > -1) {
+            dokumenty.splice(dokumenty.indexOf(id), 1);
+        }
+
+        localStorage.setItem("documentsList", JSON.stringify(dokumenty));
+        localStorage.removeItem(id);
+    }
 }
 
 class DocumentList {
@@ -223,7 +240,7 @@ class DocumentList {
         this.dokumenty = this.locStorage.getDocuments();
     }
 
-    getDocument(id: string) : any {
+    getDocument(id: string): any {
         return this.locStorage.loadDocument(id);
     }
 
@@ -243,7 +260,7 @@ class DocumentList {
             usun.innerHTML = "Usuń";
             usun.href = "#";
             usun.addEventListener("click", () => {
-
+                this.removeDocument(idDokumentu);
             });
 
             let przyciski = dokument.insertCell();
@@ -254,6 +271,11 @@ class DocumentList {
 
         rodzic.appendChild(tabela);
     }
+
+    removeDocument(id: string) : void {
+        this.locStorage.removeDocument(id);
+    }
+
 }
 
 class App {

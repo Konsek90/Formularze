@@ -110,7 +110,7 @@ var Form = /** @class */ (function () {
         przyciskWstecz.type = "button";
         przyciskWstecz.innerHTML = "Wstecz";
         przyciskWstecz.addEventListener("click", function (e) {
-            window.location.href = "/index.html";
+            window.location.href = "index.html";
         });
         formularz.appendChild(przyciskWstecz);
         var przyciskZapisu = document.createElement("button");
@@ -167,6 +167,18 @@ var LocStorage = /** @class */ (function () {
         }
         return dokumenty;
     };
+    LocStorage.prototype.removeDocument = function (id) {
+        var listaDokumentow = localStorage.getItem("documentsList");
+        var dokumenty = [];
+        if (listaDokumentow !== null) {
+            dokumenty = JSON.parse(listaDokumentow);
+        }
+        if (dokumenty.indexOf(id) > -1) {
+            dokumenty.splice(dokumenty.indexOf(id), 1);
+        }
+        localStorage.setItem("documentsList", JSON.stringify(dokumenty));
+        localStorage.removeItem(id);
+    };
     return LocStorage;
 }());
 var DocumentList = /** @class */ (function () {
@@ -181,10 +193,10 @@ var DocumentList = /** @class */ (function () {
         return this.locStorage.loadDocument(id);
     };
     DocumentList.prototype.render = function (rodzic) {
+        var _this = this;
         var tabela = document.createElement("table");
         var bodyTabeli = tabela.createTBody();
-        for (var _i = 0, _a = this.dokumenty; _i < _a.length; _i++) {
-            var idDokumentu = _a[_i];
+        var _loop_1 = function (idDokumentu) {
             var dokument = bodyTabeli.insertRow();
             dokument.insertCell().innerHTML = idDokumentu;
             var edycja = document.createElement("a");
@@ -194,12 +206,20 @@ var DocumentList = /** @class */ (function () {
             usun.innerHTML = "Usuń";
             usun.href = "#";
             usun.addEventListener("click", function () {
+                _this.removeDocument(idDokumentu);
             });
             var przyciski = dokument.insertCell();
             przyciski.appendChild(edycja);
             przyciski.appendChild(usun);
+        };
+        for (var _i = 0, _a = this.dokumenty; _i < _a.length; _i++) {
+            var idDokumentu = _a[_i];
+            _loop_1(idDokumentu);
         }
         rodzic.appendChild(tabela);
+    };
+    DocumentList.prototype.removeDocument = function (id) {
+        this.locStorage.removeDocument(id);
     };
     return DocumentList;
 }());
