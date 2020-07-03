@@ -121,6 +121,7 @@ class CheckboxField implements Field {
 }
 
 class Form {
+    locStorage = new LocStorage();
     pola: Field[];
     
     constructor(pola: Field[]) {
@@ -133,14 +134,23 @@ class Form {
         for (const pole of this.pola) {
            pole.render(formularz);
         }
+        
+        let przyciskWstecz = document.createElement("button");
+        przyciskWstecz.type = "button";
+        przyciskWstecz.innerHTML = "Wstecz";
+        przyciskWstecz.addEventListener("click", (e) => {
+            window.location.href = "/index.html";
+        });
+        formularz.appendChild(przyciskWstecz);
 
-        let przycisk = document.createElement("button");
-        przycisk.type = "submit";
-        przycisk.innerHTML = "Wyślij";
-        przycisk.addEventListener("click", (e) => {
+        let przyciskZapisu = document.createElement("button");
+        przyciskZapisu.type = "submit";
+        przyciskZapisu.innerHTML = "Wyślij";
+        przyciskZapisu.addEventListener("click", (e) => {
+            this.save();
             e.preventDefault();
         });
-        formularz.appendChild(przycisk);
+        formularz.appendChild(przyciskZapisu);
 
         rodzic.appendChild(formularz);
     }
@@ -152,6 +162,10 @@ class Form {
             wartosci[pole.element.name] = pole.getValue(); 
         }
         return wartosci;
+    }
+
+    save(): void {
+        this.locStorage.saveDocument(this.getValue());
     }
 }
 
@@ -226,7 +240,7 @@ class DocumentList {
             edycja.href = "edit-document.html?id=" + idDokumentu;
 
             let usun = document.createElement("a");
-            usun.innerHTML = "Usun";
+            usun.innerHTML = "Usuń";
             usun.href = "#";
             usun.addEventListener("click", () => {
 

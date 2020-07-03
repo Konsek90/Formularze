@@ -96,21 +96,31 @@ var CheckboxField = /** @class */ (function () {
 }());
 var Form = /** @class */ (function () {
     function Form(pola) {
+        this.locStorage = new LocStorage();
         this.pola = pola;
     }
     Form.prototype.render = function (rodzic) {
+        var _this = this;
         var formularz = document.createElement("form");
         for (var _i = 0, _a = this.pola; _i < _a.length; _i++) {
             var pole = _a[_i];
             pole.render(formularz);
         }
-        var przycisk = document.createElement("button");
-        przycisk.type = "submit";
-        przycisk.innerHTML = "Wyślij";
-        przycisk.addEventListener("click", function (e) {
+        var przyciskWstecz = document.createElement("button");
+        przyciskWstecz.type = "button";
+        przyciskWstecz.innerHTML = "Wstecz";
+        przyciskWstecz.addEventListener("click", function (e) {
+            window.location.href = "/index.html";
+        });
+        formularz.appendChild(przyciskWstecz);
+        var przyciskZapisu = document.createElement("button");
+        przyciskZapisu.type = "submit";
+        przyciskZapisu.innerHTML = "Wyślij";
+        przyciskZapisu.addEventListener("click", function (e) {
+            _this.save();
             e.preventDefault();
         });
-        formularz.appendChild(przycisk);
+        formularz.appendChild(przyciskZapisu);
         rodzic.appendChild(formularz);
     };
     Form.prototype.getValue = function () {
@@ -120,6 +130,9 @@ var Form = /** @class */ (function () {
             wartosci[pole.element.name] = pole.getValue();
         }
         return wartosci;
+    };
+    Form.prototype.save = function () {
+        this.locStorage.saveDocument(this.getValue());
     };
     return Form;
 }());
@@ -178,7 +191,7 @@ var DocumentList = /** @class */ (function () {
             edycja.innerHTML = "Edytuj";
             edycja.href = "edit-document.html?id=" + idDokumentu;
             var usun = document.createElement("a");
-            usun.innerHTML = "Usun";
+            usun.innerHTML = "Usuń";
             usun.href = "#";
             usun.addEventListener("click", function () {
             });
