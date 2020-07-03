@@ -90,7 +90,7 @@ var CheckboxField = /** @class */ (function () {
         rodzic.appendChild(this.element);
     };
     CheckboxField.prototype.getValue = function () {
-        return this.element.value;
+        return this.element.checked.toString();
     };
     return CheckboxField;
 }());
@@ -155,6 +155,40 @@ var LocStorage = /** @class */ (function () {
         return dokumenty;
     };
     return LocStorage;
+}());
+var DocumentList = /** @class */ (function () {
+    function DocumentList() {
+        this.dokumenty = [];
+        this.locStorage = new LocStorage();
+    }
+    DocumentList.prototype.getDocumentList = function () {
+        this.dokumenty = this.locStorage.getDocuments();
+    };
+    DocumentList.prototype.getDocument = function (id) {
+        return this.locStorage.loadDocument(id);
+    };
+    DocumentList.prototype.render = function (rodzic) {
+        var tabela = document.createElement("table");
+        var bodyTabeli = tabela.createTBody();
+        for (var _i = 0, _a = this.dokumenty; _i < _a.length; _i++) {
+            var idDokumentu = _a[_i];
+            var dokument = bodyTabeli.insertRow();
+            dokument.insertCell().innerHTML = idDokumentu;
+            var edycja = document.createElement("a");
+            edycja.innerHTML = "Edytuj";
+            edycja.href = "edit-document.html?id=" + idDokumentu;
+            var usun = document.createElement("a");
+            usun.innerHTML = "Usun";
+            usun.href = "#";
+            usun.addEventListener("click", function () {
+            });
+            var przyciski = dokument.insertCell();
+            przyciski.appendChild(edycja);
+            przyciski.appendChild(usun);
+        }
+        rodzic.appendChild(tabela);
+    };
+    return DocumentList;
 }());
 var App = /** @class */ (function () {
     function App() {

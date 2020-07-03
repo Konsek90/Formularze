@@ -116,7 +116,7 @@ class CheckboxField implements Field {
     }
 
     getValue(): string {
-        return this.element.value;
+        return this.element.checked.toString();
     }
 }
 
@@ -198,6 +198,47 @@ class LocStorage implements DataStorage {
         }
 
         return dokumenty;
+    }
+}
+
+class DocumentList {
+    dokumenty: string[] = [];
+    locStorage = new LocStorage();
+
+    getDocumentList(): void {
+        this.dokumenty = this.locStorage.getDocuments();
+    }
+
+    getDocument(id: string) : any {
+        return this.locStorage.loadDocument(id);
+    }
+
+    render(rodzic: HTMLElement): void {
+        let tabela = document.createElement("table");
+        let bodyTabeli = tabela.createTBody();
+
+        for (let idDokumentu of this.dokumenty) {
+            let dokument = bodyTabeli.insertRow();
+            dokument.insertCell().innerHTML = idDokumentu;
+
+            let edycja = document.createElement("a");
+            edycja.innerHTML = "Edytuj";
+            edycja.href = "edit-document.html?id=" + idDokumentu;
+
+            let usun = document.createElement("a");
+            usun.innerHTML = "Usun";
+            usun.href = "#";
+            usun.addEventListener("click", () => {
+
+            });
+
+            let przyciski = dokument.insertCell();
+
+            przyciski.appendChild(edycja);
+            przyciski.appendChild(usun);
+        }
+
+        rodzic.appendChild(tabela);
     }
 }
 
