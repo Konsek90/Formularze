@@ -258,7 +258,6 @@ class LocStorage implements DataStorage {
     }
 
     removeDocument(id: string): void {
-
         let listaDokumentow = localStorage.getItem("documentList");
         let dokumenty : string[] = [];
 
@@ -272,6 +271,60 @@ class LocStorage implements DataStorage {
 
         localStorage.setItem("documentList", JSON.stringify(dokumenty));
         localStorage.removeItem(id);
+    }
+
+    saveForm(wartosci: any, id: string = ""): string {
+        if (id === "") {
+            id = "form-" + Date.now();
+        }
+        
+        let formList = localStorage.getItem("formList");
+        let formularze: string[] = [];
+
+        if (formList !== null) {
+            formularze = JSON.parse(formList);
+        }
+
+        if(formularze.indexOf(id) < 0) {
+            formularze.push(id);
+        }
+
+        localStorage.setItem("formList", JSON.stringify(formularze));
+        localStorage.setItem(id, JSON.stringify(wartosci));
+
+        return id;
+    }
+
+    removeForm(id: string): void {
+        localStorage.removeItem(id);
+
+        let formList = localStorage.getItem("formList");
+        let formularze: string[] = [];
+
+        if (formList !== null) {
+            formularze = JSON.parse(formList);
+        }
+
+        if (formularze.indexOf(id) > -1) {
+            formularze.splice(formularze.indexOf(id), 1);
+        }
+
+        localStorage.setItem("formList", JSON.stringify(formularze));
+    }
+
+    loadForm(id: string): any {
+        return JSON.parse(localStorage.getItem(id)!);
+    }
+
+    getForms(): string[] {
+        let formList = localStorage.getItem("formList");
+        let forms: string[] = [];
+ 
+        if (formList !== null) {
+            forms = JSON.parse(formList);
+        }
+
+        return forms;
     }
 }
 
@@ -332,21 +385,216 @@ class Router {
     }
 }
 
+class FormCreator {
+    locStorage = new LocStorage();
+
+    newForm(rodzic: HTMLElement): void {
+        let formularz = document.createElement("form");
+
+        let dodajPole = document.createElement("button");
+        dodajPole.type = "button";
+        dodajPole.innerText = "Dodaj";
+        dodajPole.addEventListener("click", () => {
+            this.generujPole(divFields);
+        });
+        let usunPole = document.createElement("button");
+        usunPole.type = "button";
+        usunPole.innerText = "Usuń";
+        usunPole.addEventListener("click", () => {     
+            divFields.removeChild(divFields.lastChild!);
+        });
+        formularz.appendChild(dodajPole);
+        formularz.appendChild(usunPole);
+        
+        let divFields = document.createElement("div");
+        divFields.id = "pola";
+
+        this.generujPole(divFields);
+        formularz.appendChild(divFields);
+
+        let wstecz = document.createElement("button");
+        wstecz.type = "button";
+        wstecz.innerHTML = "Wstecz"
+        wstecz.addEventListener("click", (e) => {
+            window.location.href = "/index.html";
+        });
+
+        let zapisz = document.createElement("button");
+        zapisz.type = "submit";
+        zapisz.innerHTML = "Zapisz"
+        zapisz.addEventListener("click", (e) => {
+            this.saveForm();
+            window.location.href = "/form-list.html";
+            e.preventDefault();
+        });
+
+        formularz.appendChild(wstecz);
+        formularz.appendChild(zapisz);
+
+        rodzic.appendChild(formularz);
+    }
+
+    getValue(): ZapisanePole[] {
+        let values: ZapisanePole[] = [];
+        const formFields: HTMLElement = document.getElementById("pola")!;
+
+        for (const formField of formFields.children) {
+            let nazwa = formField.querySelector("input[name='nazwaPola']") as HTMLInputElement;
+            let etykieta = formField.querySelector("input[name='etykietaPola']") as HTMLInputElement;
+            let typ = formField.querySelector("select[name='typPola']") as HTMLSelectElement;
+            let opcje = formField.querySelector("input[name='opcjePola']") as HTMLInputElement;
+            let domyslnaWartosc = formField.querySelector("input[name='wartoscPola']") as HTMLInputElement;
+
+            let typPola: string = typ.value.toUpperCase();
+            let opcjePola: string[] = opcje.value.split("|");
+
+            values.push({
+                nazwa: nazwa.value,
+                etykieta: etykieta.value,
+                typ: (<any>FieldType)[typPola],
+                opcje: opcjePola,
+                domyslnaWartosc: domyslnaWartosc.value
+            });
+        }
+
+        return values;
+    }
+
+    saveForm(): void {
+        this.locStorage.saveForm(this.getValue());
+    }
+
+    renderList(rodzic: HTMLElement): void {
+        let tabela = document.createElement("table");
+        let bodyTabeli = tabela.createTBody();
+        let formularze = this.locStorage.getForms();
+
+        for (const idForumlarza of formularze) {
+            let dokument = bodyTabeli.insertRow();
+            dokument.insertCell().innerHTML = idForumlarza;
+
+            let edycja = document.createElement("a");
+            edycja.innerHTML = "Wypełnij";
+            edycja.href = "new-document.html?id=" + idForumlarza;
+
+            let usun = document.createElement("a");
+            usun.innerHTML = "Usuń";
+            usun.href = "#";
+            usun.addEventListener("click", () => {
+                this.locStorage.removeForm(idForumlarza);
+                window.location.reload();
+            });
+
+            let przyciski = dokument.insertCell();
+
+            przyciski.appendChild(edycja);
+            przyciski.innerHTML += "&nbsp;";
+            przyciski.appendChild(usun);
+        }
+
+        rodzic.appendChild(tabela);
+    }
+
+    private generujPole(rodzic: HTMLElement) {
+        let pole = document.createElement("div");
+        pole.appendChild(document.createElement("hr"));
+        
+        let typPola = document.createElement("select");
+        typPola.name = "typPola";
+
+        for (let opcja of Object.keys(FieldType)) {
+            let el = document.createElement("option");
+            el.value = el.text = opcja;
+
+            typPola.appendChild(el);
+        }
+
+        typPola.addEventListener("change", () => {
+            if (typPola.value === "SELECT") {
+                opcjePola.style.display = "block";
+            }
+            else {
+                opcjePola.style.display = "none";
+            }
+        });
+
+        pole.appendChild(typPola);
+        
+        let nazwaPola = document.createElement("input");
+        nazwaPola.name = "nazwaPola";
+        nazwaPola.type = "text";
+        nazwaPola.placeholder = "nazwa"
+        pole.appendChild(nazwaPola);
+        
+        let etykietaPola = document.createElement("input");
+        etykietaPola.name = "etykietaPola";
+        etykietaPola.type = "text";
+        etykietaPola.placeholder = "etykieta"
+        pole.appendChild(etykietaPola);
+        
+        let wartoscPola = document.createElement("input");
+        wartoscPola.name = "wartoscPola";
+        wartoscPola.type = "text";
+        wartoscPola.placeholder = "wartość"
+        pole.appendChild(wartoscPola);
+
+        let opcjePola = document.createElement("input");
+        opcjePola.name = "opcjePola";
+        opcjePola.type = "text";
+        opcjePola.placeholder = "opcje (oddzielone \"|\")";
+        opcjePola.style.display = "none";
+        pole.appendChild(opcjePola);
+
+        rodzic.appendChild(pole);
+    }
+}
+
 class App {
     inicjacja() {
         let documentList = new DocumentList();
+        let formCreator = new FormCreator();
 
         switch (window.location.pathname) {
             case '/new-document.html':
-                let formularz = new Form([
-                    new InputField("imie", "Imię", FieldType.TEXT),
-                    new InputField("nazwisko", "Nazwisko", FieldType.TEXT),
-                    new InputField("email", "E-mail", FieldType.EMAIL),
-                    new SelectField("kierunek", "Wybrany kierunek studiów", ["Informatyka i Ekonometria", "Finanse i Rachunkowość", "Zarządzanie"]),
-                    new CheckboxField("elearning", "Czy preferujesz e-learning?"),
-                    new TextAreaField("uwagi", "Uwagi")
-                ]);
-                formularz.render(document.body);
+                let idForumlarza = Router.getParam("id")!;
+
+                let formularz: ZapisanePole[] = documentList.getDocument(idForumlarza);
+
+                if (formularz !== null) {
+                    let pola = [];
+
+                    for (const fieldInfo of formularz) {
+                        let pole: Field;
+            
+                        switch (fieldInfo.typ) {
+                            case FieldType.TEXT:
+                            case FieldType.DATE:
+                            case FieldType.EMAIL:
+                                pole = new InputField(fieldInfo.nazwa, fieldInfo.etykieta, fieldInfo.typ, fieldInfo.domyslnaWartosc);
+                                break;
+                        
+                            case FieldType.TEXTAREA:
+                                pole = new TextAreaField(fieldInfo.nazwa, fieldInfo.etykieta, fieldInfo.domyslnaWartosc);
+                                break;
+                        
+                            case FieldType.SELECT:
+                                pole = new SelectField(fieldInfo.nazwa, fieldInfo.etykieta, fieldInfo.opcje, fieldInfo.domyslnaWartosc);
+                                break;
+                    
+                            case FieldType.CHECKBOX:
+                                pole = new CheckboxField(fieldInfo.nazwa, fieldInfo.etykieta, fieldInfo.domyslnaWartosc);
+                                break;
+                        }
+            
+                        pola.push(pole);
+                    }
+
+                    const form = new Form(pola, idForumlarza);
+                    form.render(document.body);
+                }
+                else {
+                    document.body.innerHTML = "Nie znaleziono formularza";
+                }
                 break;
 
             case '/edit-document.html':
@@ -394,6 +642,14 @@ class App {
             case '/document-list.html':
                 documentList.getDocumentList();
                 documentList.render(document.body);
+                break;
+
+            case '/new-form.html':
+                formCreator.newForm(document.body);
+                break;
+            
+            case '/form-list.html':
+                formCreator.renderList(document.body);
                 break;
         }
     }

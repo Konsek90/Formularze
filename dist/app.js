@@ -8,20 +8,16 @@ var FieldType;
     FieldType["SELECT"] = "SELECT";
     FieldType["CHECKBOX"] = "CHECKBOX";
 })(FieldType || (FieldType = {}));
-var FieldLabel = /** @class */ (function () {
-    function FieldLabel() {
-    }
-    FieldLabel.stworz = function (pole) {
-        var etykieta = document.createElement("label");
+class FieldLabel {
+    static stworz(pole) {
+        let etykieta = document.createElement("label");
         etykieta.innerHTML = pole.etykieta;
         etykieta.htmlFor = pole.element.name;
         return etykieta;
-    };
-    return FieldLabel;
-}());
-var InputField = /** @class */ (function () {
-    function InputField(nazwa, etykieta, typ, wartoscDomyslna) {
-        if (wartoscDomyslna === void 0) { wartoscDomyslna = ""; }
+    }
+}
+class InputField {
+    constructor(nazwa, etykieta, typ, wartoscDomyslna = "") {
         this.opcje = null;
         this.etykieta = etykieta;
         this.element = document.createElement("input");
@@ -29,19 +25,17 @@ var InputField = /** @class */ (function () {
         this.element.type = this.typ = typ;
         this.element.value = wartoscDomyslna;
     }
-    InputField.prototype.render = function (rodzic) {
-        var labelElement = FieldLabel.stworz(this);
+    render(rodzic) {
+        let labelElement = FieldLabel.stworz(this);
         rodzic.appendChild(labelElement);
         rodzic.appendChild(this.element);
-    };
-    InputField.prototype.getValue = function () {
+    }
+    getValue() {
         return this.element.value;
-    };
-    return InputField;
-}());
-var TextAreaField = /** @class */ (function () {
-    function TextAreaField(nazwa, etykieta, wartoscDomyslna) {
-        if (wartoscDomyslna === void 0) { wartoscDomyslna = ""; }
+    }
+}
+class TextAreaField {
+    constructor(nazwa, etykieta, wartoscDomyslna = "") {
         this.typ = FieldType.TEXTAREA;
         this.opcje = null;
         this.etykieta = etykieta;
@@ -49,45 +43,40 @@ var TextAreaField = /** @class */ (function () {
         this.element.name = nazwa;
         this.element.value = wartoscDomyslna;
     }
-    TextAreaField.prototype.render = function (rodzic) {
-        var labelElement = FieldLabel.stworz(this);
+    render(rodzic) {
+        let labelElement = FieldLabel.stworz(this);
         rodzic.appendChild(labelElement);
         rodzic.appendChild(this.element);
-    };
-    TextAreaField.prototype.getValue = function () {
+    }
+    getValue() {
         return this.element.value;
-    };
-    return TextAreaField;
-}());
-var SelectField = /** @class */ (function () {
-    function SelectField(nazwa, etykieta, opcje, wartoscDomyslna) {
-        if (wartoscDomyslna === void 0) { wartoscDomyslna = ""; }
+    }
+}
+class SelectField {
+    constructor(nazwa, etykieta, opcje, wartoscDomyslna = "") {
         this.typ = FieldType.SELECT;
         this.etykieta = etykieta;
         this.element = document.createElement("select");
         this.element.name = nazwa;
-        for (var _i = 0, opcje_1 = opcje; _i < opcje_1.length; _i++) {
-            var wartosc = opcje_1[_i];
-            var optionElement = document.createElement("option");
+        for (const wartosc of opcje) {
+            let optionElement = document.createElement("option");
             optionElement.text = optionElement.value = wartosc;
             this.element.appendChild(optionElement);
         }
         this.opcje = opcje;
         this.element.value = wartoscDomyslna;
     }
-    SelectField.prototype.render = function (rodzic) {
-        var labelElement = FieldLabel.stworz(this);
+    render(rodzic) {
+        let labelElement = FieldLabel.stworz(this);
         rodzic.appendChild(labelElement);
         rodzic.appendChild(this.element);
-    };
-    SelectField.prototype.getValue = function () {
+    }
+    getValue() {
         return this.element.value;
-    };
-    return SelectField;
-}());
-var CheckboxField = /** @class */ (function () {
-    function CheckboxField(nazwa, etykieta, domyslnaWartosc) {
-        if (domyslnaWartosc === void 0) { domyslnaWartosc = "false"; }
+    }
+}
+class CheckboxField {
+    constructor(nazwa, etykieta, domyslnaWartosc = "false") {
         this.typ = FieldType.CHECKBOX;
         this.opcje = null;
         this.etykieta = etykieta;
@@ -101,56 +90,49 @@ var CheckboxField = /** @class */ (function () {
             this.element.checked = false;
         }
     }
-    CheckboxField.prototype.render = function (rodzic) {
-        var labelElement = FieldLabel.stworz(this);
+    render(rodzic) {
+        let labelElement = FieldLabel.stworz(this);
         rodzic.appendChild(labelElement);
         rodzic.appendChild(this.element);
-    };
-    CheckboxField.prototype.getValue = function () {
+    }
+    getValue() {
         return this.element.checked.toString();
-    };
-    return CheckboxField;
-}());
-var Form = /** @class */ (function () {
-    function Form(pola, idForumlarza, trybEdycji, idDokumentu) {
-        if (idForumlarza === void 0) { idForumlarza = ""; }
-        if (trybEdycji === void 0) { trybEdycji = false; }
-        if (idDokumentu === void 0) { idDokumentu = ""; }
+    }
+}
+class Form {
+    constructor(pola, idForumlarza = "", trybEdycji = false, idDokumentu = "") {
         this.locStorage = new LocStorage();
         this.pola = pola;
         this.trybEdycji = trybEdycji;
         this.idDokumentu = idDokumentu;
         this.idForumlarza = idForumlarza;
     }
-    Form.prototype.render = function (rodzic) {
-        var _this = this;
-        var formularz = document.createElement("form");
-        for (var _i = 0, _a = this.pola; _i < _a.length; _i++) {
-            var pole = _a[_i];
+    render(rodzic) {
+        let formularz = document.createElement("form");
+        for (const pole of this.pola) {
             pole.render(formularz);
         }
-        var przyciskWstecz = document.createElement("button");
+        let przyciskWstecz = document.createElement("button");
         przyciskWstecz.type = "button";
         przyciskWstecz.innerHTML = "Wstecz";
-        przyciskWstecz.addEventListener("click", function (e) {
+        przyciskWstecz.addEventListener("click", (e) => {
             window.location.href = "/index.html";
         });
         formularz.appendChild(przyciskWstecz);
-        var przyciskZapisu = document.createElement("button");
+        let przyciskZapisu = document.createElement("button");
         przyciskZapisu.type = "submit";
         przyciskZapisu.innerHTML = "Wyślij";
-        przyciskZapisu.addEventListener("click", function (e) {
-            _this.save();
+        przyciskZapisu.addEventListener("click", (e) => {
+            this.save();
             window.location.href = "/document-list.html";
             e.preventDefault();
         });
         formularz.appendChild(przyciskZapisu);
         rodzic.appendChild(formularz);
-    };
-    Form.prototype.getValue = function () {
-        var wartosci = [];
-        for (var _i = 0, _a = this.pola; _i < _a.length; _i++) {
-            var pole = _a[_i];
+    }
+    getValue() {
+        let wartosci = [];
+        for (const pole of this.pola) {
             wartosci.push({
                 nazwa: pole.element.name,
                 etykieta: pole.etykieta,
@@ -160,27 +142,23 @@ var Form = /** @class */ (function () {
             });
         }
         return wartosci;
-    };
-    Form.prototype.save = function () {
+    }
+    save() {
         if (this.trybEdycji) {
             this.locStorage.saveDocument(this.getValue(), this.idDokumentu);
         }
         else {
             this.locStorage.saveDocument(this.getValue());
         }
-    };
-    return Form;
-}());
-var LocStorage = /** @class */ (function () {
-    function LocStorage() {
     }
-    LocStorage.prototype.saveDocument = function (wartosci, id) {
-        if (id === void 0) { id = ""; }
+}
+class LocStorage {
+    saveDocument(wartosci, id = "") {
         if (id === "") {
             id = "document-" + Date.now();
         }
-        var listaDokumentow = localStorage.getItem("documentList");
-        var dokumenty = [];
+        let listaDokumentow = localStorage.getItem("documentList");
+        let dokumenty = [];
         if (listaDokumentow !== null) {
             dokumenty = JSON.parse(listaDokumentow);
         }
@@ -190,21 +168,21 @@ var LocStorage = /** @class */ (function () {
         localStorage.setItem("documentList", JSON.stringify(dokumenty));
         localStorage.setItem(id, JSON.stringify(wartosci));
         return id;
-    };
-    LocStorage.prototype.loadDocument = function (id) {
+    }
+    loadDocument(id) {
         return JSON.parse(localStorage.getItem(id));
-    };
-    LocStorage.prototype.getDocuments = function () {
-        var listaDokumentow = localStorage.getItem("documentList");
-        var dokumenty = [];
+    }
+    getDocuments() {
+        let listaDokumentow = localStorage.getItem("documentList");
+        let dokumenty = [];
         if (listaDokumentow !== null) {
             dokumenty = JSON.parse(listaDokumentow);
         }
         return dokumenty;
-    };
-    LocStorage.prototype.removeDocument = function (id) {
-        var listaDokumentow = localStorage.getItem("documentList");
-        var dokumenty = [];
+    }
+    removeDocument(id) {
+        let listaDokumentow = localStorage.getItem("documentList");
+        let dokumenty = [];
         if (listaDokumentow !== null) {
             dokumenty = JSON.parse(listaDokumentow);
         }
@@ -213,89 +191,238 @@ var LocStorage = /** @class */ (function () {
         }
         localStorage.setItem("documentList", JSON.stringify(dokumenty));
         localStorage.removeItem(id);
-    };
-    return LocStorage;
-}());
-var DocumentList = /** @class */ (function () {
-    function DocumentList() {
+    }
+    saveForm(wartosci, id = "") {
+        if (id === "") {
+            id = "form-" + Date.now();
+        }
+        let formList = localStorage.getItem("formList");
+        let formularze = [];
+        if (formList !== null) {
+            formularze = JSON.parse(formList);
+        }
+        if (formularze.indexOf(id) < 0) {
+            formularze.push(id);
+        }
+        localStorage.setItem("formList", JSON.stringify(formularze));
+        localStorage.setItem(id, JSON.stringify(wartosci));
+        return id;
+    }
+    removeForm(id) {
+        localStorage.removeItem(id);
+        let formList = localStorage.getItem("formList");
+        let formularze = [];
+        if (formList !== null) {
+            formularze = JSON.parse(formList);
+        }
+        if (formularze.indexOf(id) > -1) {
+            formularze.splice(formularze.indexOf(id), 1);
+        }
+        localStorage.setItem("formList", JSON.stringify(formularze));
+    }
+    loadForm(id) {
+        return JSON.parse(localStorage.getItem(id));
+    }
+    getForms() {
+        let formList = localStorage.getItem("formList");
+        let forms = [];
+        if (formList !== null) {
+            forms = JSON.parse(formList);
+        }
+        return forms;
+    }
+}
+class DocumentList {
+    constructor() {
         this.dokumenty = [];
         this.locStorage = new LocStorage();
     }
-    DocumentList.prototype.getDocumentList = function () {
+    getDocumentList() {
         this.dokumenty = this.locStorage.getDocuments();
-    };
-    DocumentList.prototype.getDocument = function (id) {
+    }
+    getDocument(id) {
         return this.locStorage.loadDocument(id);
-    };
-    DocumentList.prototype.render = function (rodzic) {
-        var _this = this;
-        var tabela = document.createElement("table");
-        var bodyTabeli = tabela.createTBody();
-        var _loop_1 = function (idDokumentu) {
-            var dokument = bodyTabeli.insertRow();
+    }
+    render(rodzic) {
+        let tabela = document.createElement("table");
+        let bodyTabeli = tabela.createTBody();
+        for (let idDokumentu of this.dokumenty) {
+            let dokument = bodyTabeli.insertRow();
             dokument.insertCell().innerHTML = idDokumentu;
-            var edycja = document.createElement("a");
+            let edycja = document.createElement("a");
             edycja.innerHTML = "Edytuj";
             edycja.href = "edit-document.html?id=" + idDokumentu;
-            var usun = document.createElement("a");
+            let usun = document.createElement("a");
             usun.innerHTML = "Usuń";
             usun.href = "#";
-            usun.addEventListener("click", function () {
-                _this.removeDocument(idDokumentu);
+            usun.addEventListener("click", () => {
+                this.removeDocument(idDokumentu);
                 window.location.reload();
             });
-            var przyciski = dokument.insertCell();
+            let przyciski = dokument.insertCell();
             przyciski.appendChild(edycja);
             przyciski.innerHTML += "&nbsp;";
             przyciski.appendChild(usun);
-        };
-        for (var _i = 0, _a = this.dokumenty; _i < _a.length; _i++) {
-            var idDokumentu = _a[_i];
-            _loop_1(idDokumentu);
         }
         rodzic.appendChild(tabela);
-    };
-    DocumentList.prototype.removeDocument = function (id) {
+    }
+    removeDocument(id) {
         this.locStorage.removeDocument(id);
-    };
-    return DocumentList;
-}());
-var Router = /** @class */ (function () {
-    function Router() {
     }
-    Router.getParam = function (klucz) {
-        var query = window.location.search.substr(1);
-        var urlParams = new URLSearchParams(query);
-        var param = urlParams.get(klucz);
+}
+class Router {
+    static getParam(klucz) {
+        const query = window.location.search.substr(1);
+        const urlParams = new URLSearchParams(query);
+        const param = urlParams.get(klucz);
         return param;
-    };
-    return Router;
-}());
-var App = /** @class */ (function () {
-    function App() {
     }
-    App.prototype.inicjacja = function () {
-        var documentList = new DocumentList();
+}
+class FormCreator {
+    constructor() {
+        this.locStorage = new LocStorage();
+    }
+    newForm(rodzic) {
+        let formularz = document.createElement("form");
+        let dodajPole = document.createElement("button");
+        dodajPole.type = "button";
+        dodajPole.innerText = "Dodaj";
+        dodajPole.addEventListener("click", () => {
+            this.generujPole(divFields);
+        });
+        let usunPole = document.createElement("button");
+        usunPole.type = "button";
+        usunPole.innerText = "Usuń";
+        usunPole.addEventListener("click", () => {
+            divFields.removeChild(divFields.lastChild);
+        });
+        formularz.appendChild(dodajPole);
+        formularz.appendChild(usunPole);
+        let divFields = document.createElement("div");
+        divFields.id = "pola";
+        this.generujPole(divFields);
+        formularz.appendChild(divFields);
+        let wstecz = document.createElement("button");
+        wstecz.type = "button";
+        wstecz.innerHTML = "Wstecz";
+        wstecz.addEventListener("click", (e) => {
+            window.location.href = "/index.html";
+        });
+        let zapisz = document.createElement("button");
+        zapisz.type = "submit";
+        zapisz.innerHTML = "Zapisz";
+        zapisz.addEventListener("click", (e) => {
+            this.saveForm();
+            window.location.href = "/form-list.html";
+            e.preventDefault();
+        });
+        formularz.appendChild(wstecz);
+        formularz.appendChild(zapisz);
+        rodzic.appendChild(formularz);
+    }
+    getValue() {
+        let values = [];
+        const formFields = document.getElementById("pola");
+        for (const formField of formFields.children) {
+            let nazwa = formField.querySelector("input[name='nazwaPola']");
+            let etykieta = formField.querySelector("input[name='etykietaPola']");
+            let typ = formField.querySelector("select[name='typPola']");
+            let opcje = formField.querySelector("input[name='opcjePola']");
+            let domyslnaWartosc = formField.querySelector("input[name='wartoscPola']");
+            let typPola = typ.value.toUpperCase();
+            let opcjePola = opcje.value.split("|");
+            values.push({
+                nazwa: nazwa.value,
+                etykieta: etykieta.value,
+                typ: FieldType[typPola],
+                opcje: opcjePola,
+                domyslnaWartosc: domyslnaWartosc.value
+            });
+        }
+        return values;
+    }
+    saveForm() {
+        this.locStorage.saveForm(this.getValue());
+    }
+    renderList(rodzic) {
+        let tabela = document.createElement("table");
+        let bodyTabeli = tabela.createTBody();
+        let formularze = this.locStorage.getForms();
+        for (const idForumlarza of formularze) {
+            let dokument = bodyTabeli.insertRow();
+            dokument.insertCell().innerHTML = idForumlarza;
+            let edycja = document.createElement("a");
+            edycja.innerHTML = "Wypełnij";
+            edycja.href = "new-document.html?id=" + idForumlarza;
+            let usun = document.createElement("a");
+            usun.innerHTML = "Usuń";
+            usun.href = "#";
+            usun.addEventListener("click", () => {
+                this.locStorage.removeForm(idForumlarza);
+                window.location.reload();
+            });
+            let przyciski = dokument.insertCell();
+            przyciski.appendChild(edycja);
+            przyciski.innerHTML += "&nbsp;";
+            przyciski.appendChild(usun);
+        }
+        rodzic.appendChild(tabela);
+    }
+    generujPole(rodzic) {
+        let pole = document.createElement("div");
+        pole.appendChild(document.createElement("hr"));
+        let typPola = document.createElement("select");
+        typPola.name = "typPola";
+        for (let opcja of Object.keys(FieldType)) {
+            let el = document.createElement("option");
+            el.value = el.text = opcja;
+            typPola.appendChild(el);
+        }
+        typPola.addEventListener("change", () => {
+            if (typPola.value === "SELECT") {
+                opcjePola.style.display = "block";
+            }
+            else {
+                opcjePola.style.display = "none";
+            }
+        });
+        pole.appendChild(typPola);
+        let nazwaPola = document.createElement("input");
+        nazwaPola.name = "nazwaPola";
+        nazwaPola.type = "text";
+        nazwaPola.placeholder = "nazwa";
+        pole.appendChild(nazwaPola);
+        let etykietaPola = document.createElement("input");
+        etykietaPola.name = "etykietaPola";
+        etykietaPola.type = "text";
+        etykietaPola.placeholder = "etykieta";
+        pole.appendChild(etykietaPola);
+        let wartoscPola = document.createElement("input");
+        wartoscPola.name = "wartoscPola";
+        wartoscPola.type = "text";
+        wartoscPola.placeholder = "wartość";
+        pole.appendChild(wartoscPola);
+        let opcjePola = document.createElement("input");
+        opcjePola.name = "opcjePola";
+        opcjePola.type = "text";
+        opcjePola.placeholder = "opcje (oddzielone \"|\")";
+        opcjePola.style.display = "none";
+        pole.appendChild(opcjePola);
+        rodzic.appendChild(pole);
+    }
+}
+class App {
+    inicjacja() {
+        let documentList = new DocumentList();
+        let formCreator = new FormCreator();
         switch (window.location.pathname) {
             case '/new-document.html':
-                var formularz = new Form([
-                    new InputField("imie", "Imię", FieldType.TEXT),
-                    new InputField("nazwisko", "Nazwisko", FieldType.TEXT),
-                    new InputField("email", "E-mail", FieldType.EMAIL),
-                    new SelectField("kierunek", "Wybrany kierunek studiów", ["Informatyka i Ekonometria", "Finanse i Rachunkowość", "Zarządzanie"]),
-                    new CheckboxField("elearning", "Czy preferujesz e-learning?"),
-                    new TextAreaField("uwagi", "Uwagi")
-                ]);
-                formularz.render(document.body);
-                break;
-            case '/edit-document.html':
-                var idDokumentu = Router.getParam("id");
-                var dokument = documentList.getDocument(idDokumentu);
-                if (dokument !== null) {
-                    var pola = [];
-                    for (var _i = 0, dokument_1 = dokument; _i < dokument_1.length; _i++) {
-                        var fieldInfo = dokument_1[_i];
-                        var pole = void 0;
+                let idForumlarza = Router.getParam("id");
+                let formularz = documentList.getDocument(idForumlarza);
+                if (formularz !== null) {
+                    let pola = [];
+                    for (const fieldInfo of formularz) {
+                        let pole;
                         switch (fieldInfo.typ) {
                             case FieldType.TEXT:
                             case FieldType.DATE:
@@ -314,7 +441,39 @@ var App = /** @class */ (function () {
                         }
                         pola.push(pole);
                     }
-                    var form = new Form(pola, "", true, idDokumentu);
+                    const form = new Form(pola, idForumlarza);
+                    form.render(document.body);
+                }
+                else {
+                    document.body.innerHTML = "Nie znaleziono formularza";
+                }
+                break;
+            case '/edit-document.html':
+                let idDokumentu = Router.getParam("id");
+                let dokument = documentList.getDocument(idDokumentu);
+                if (dokument !== null) {
+                    let pola = [];
+                    for (const fieldInfo of dokument) {
+                        let pole;
+                        switch (fieldInfo.typ) {
+                            case FieldType.TEXT:
+                            case FieldType.DATE:
+                            case FieldType.EMAIL:
+                                pole = new InputField(fieldInfo.nazwa, fieldInfo.etykieta, fieldInfo.typ, fieldInfo.domyslnaWartosc);
+                                break;
+                            case FieldType.TEXTAREA:
+                                pole = new TextAreaField(fieldInfo.nazwa, fieldInfo.etykieta, fieldInfo.domyslnaWartosc);
+                                break;
+                            case FieldType.SELECT:
+                                pole = new SelectField(fieldInfo.nazwa, fieldInfo.etykieta, fieldInfo.opcje, fieldInfo.domyslnaWartosc);
+                                break;
+                            case FieldType.CHECKBOX:
+                                pole = new CheckboxField(fieldInfo.nazwa, fieldInfo.etykieta, fieldInfo.domyslnaWartosc);
+                                break;
+                        }
+                        pola.push(pole);
+                    }
+                    const form = new Form(pola, "", true, idDokumentu);
                     form.render(document.body);
                 }
                 else {
@@ -325,9 +484,14 @@ var App = /** @class */ (function () {
                 documentList.getDocumentList();
                 documentList.render(document.body);
                 break;
+            case '/new-form.html':
+                formCreator.newForm(document.body);
+                break;
+            case '/form-list.html':
+                formCreator.renderList(document.body);
+                break;
         }
-    };
-    return App;
-}());
-var APP = new App();
+    }
+}
+const APP = new App();
 APP.inicjacja();
